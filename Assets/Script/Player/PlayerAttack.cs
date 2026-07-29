@@ -65,7 +65,7 @@ public class PlayerAttack : MonoBehaviour
     private void ActiveProjectile()
     {
         // 파이어 작동(기본 공격) n 주기 마다 작동하도록 유지
-        if(!isFireActive && GetObject(firePool, out ProjectileData data) != null)
+        if(!isFireActive && GetObject(firePool, out ProjectileData data))
         {
             FireActive(data).Forget();
             isFireActive = true;
@@ -75,7 +75,7 @@ public class PlayerAttack : MonoBehaviour
 
     private async UniTask FireActive(ProjectileData obj)
     {
-        if (attackArea.GetClosestTarget(out Transform target) != null) 
+        if (attackArea.GetClosestTarget(out Transform target)) 
         {
             Vector2 direction = (Vector2)target.position - (Vector2)obj.transform.position;
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
@@ -121,14 +121,18 @@ public class PlayerAttack : MonoBehaviour
         Destroy(obj);
     }
 
-    public ProjectileData GetObject(ObjectPool<ProjectileData> data, out ProjectileData projectile)
+    public bool GetObject(ObjectPool<ProjectileData> data, out ProjectileData projectile)
     {
         // 1단계 방지턱 체크
-        if (firePool.CountActive >= POOL_MAX_SIZE) return projectile = null;
+        if (firePool.CountActive >= POOL_MAX_SIZE)
+        {
+            projectile = null;
+            return false;
+        }
 
         data.Get(out projectile);
 
-        return projectile;
+        return true;
     }
 
     public void ReleaseObject(ProjectileData obj)
