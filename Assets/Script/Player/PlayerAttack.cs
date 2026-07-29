@@ -25,7 +25,7 @@ public class PlayerAttack : MonoBehaviour
 
     private void Update()
     {
-        if (Keyboard.current.sKey.isPressed) Fire(GetObject());
+        //if (Keyboard.current.sKey.isPressed) Fire(GetObject());
 
 
         direction = sr.flipX ? -1 : 1;
