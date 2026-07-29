@@ -8,12 +8,12 @@ public class EnemyCombat : MonoBehaviour, IDamageable
 
     private void Start()
     {
-        JObject data = EnemyData.Instance.enemyList[0];
-        string name = data[NAME].GetValue<string>();
-        int hp = data[HP].GetValue<int>();
-        int speed = data[SPEED].GetValue<int>();
-        int damage = data[DAMAGE].GetValue<int>();
-        int armor = data[ARMOR].GetValue<int>();
+        EnemyStatus data = EnemyData.Instance.enemyList[0];
+        string name = data.name;
+        int hp = data.hp;
+        int speed = data.speed;
+        int damage = data.damage;
+        int armor = data.armor;
         stat = new Enemy(EnemyData.Instance.GetEnemyID(), name, hp, hp, speed, armor, damage);
     }
 

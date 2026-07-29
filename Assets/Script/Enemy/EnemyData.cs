@@ -9,27 +9,16 @@ public class EnemyData : MonoBehaviour
 
     public static int enemyId = 10000;
 
-    public List<JObject> enemyList = new();
-
-    public JObject firstEnemyData = new()
-    {
-        [NAME] = "더미",
-        [HP] = 100,
-        [SPEED] = 3,
-        [DAMAGE] = 10,
-        [ARMOR] = 0
-    };
+    public List<EnemyStatus> enemyList;
 
     private void Awake()
     {
         Instance = this;
-        enemyList.Add(firstEnemyData);
     }
 
     public int GetEnemyID()
     {
         enemyId++;
         return enemyId;
-        
     }
 }

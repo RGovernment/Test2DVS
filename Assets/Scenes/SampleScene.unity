@@ -2208,6 +2208,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6206e384a2d7aa54ba2dfa188dbc9a4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
+  enemyList:
+  - {fileID: 11400000, guid: e6a16e1163ad7c841884647188aa0b7d, type: 2}
 --- !u!4 &1595027752
 Transform:
   m_ObjectHideFlags: 0
