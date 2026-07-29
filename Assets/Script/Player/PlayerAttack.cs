@@ -4,21 +4,24 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Pool;
+using static SkillData;
 using static Constants;
 using static Enums;
 using SF = UnityEngine.SerializeField;
 public class PlayerAttack : MonoBehaviour
 {
+    private readonly WaitForSeconds _waitForSeconds3 = new(3);
     [SF] private PlayerAttackArea attackArea;
+    [SF] private SkillData skillData;
     [SF] private Projectile[] projectile;
-    [SF] private List<ProjectileData> projectileData; 
     [SF] private GameObject bullet;
     [SF] private Transform muzzlePoint;
-    [SF] private float bulletSpeed = 15f;
-    [SF] private float lifeTime = 10f;
     [SF] private Transform muzzlePointOffset;
 
+    private List<ProjectileData> projectileData;
     private ObjectPool<ProjectileData> firePool;
+
+    private bool isFireActive;
 
     private SpriteRenderer sr;
     private void Awake()
@@ -57,33 +60,51 @@ public class PlayerAttack : MonoBehaviour
     private void ActiveProjectile()
     {
         // 파이어 작동(기본 공격) n 주기 마다 작동하도록 유지
-        if(GetObject(firePool, out ProjectileData data) != null) 
-            FireActive(data);
+        if(!isFireActive && GetObject(firePool, out ProjectileData data) != null)
+        {
+            FireActive(data).Forget();
+            isFireActive = true;
+        }       
     }
 
 
-    private void FireActive(ProjectileData obj)
+    private async UniTask FireActive(ProjectileData obj)
     {
-        if(attackArea.GetClosestTarget(out Transform target) != null) 
+        if (attackArea.GetClosestTarget(out Transform target) != null) 
         {
-            obj.transform.parent = muzzlePoint;
             obj.transform.LookAt(target);
 
+            Vector2 direction = (Vector2)target.position - (Vector2)obj.transform.position;
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+
+            obj.transform.rotation = Quaternion.Euler(0, 0, angle);
+
             obj.rb.linearVelocity = 
-                (new Vector2(target.position.x,target.position.y) - obj.rb.position).normalized * bulletSpeed;
-            StartCoroutine(ProjectileRelease(obj));
+                (new Vector2(target.position.x,target.position.y) - obj.rb.position).normalized 
+                * skillData.fireData[BASE_PROJECTILE_SPEED].GetValue(20);
+
+            StartCoroutine(ProjectileRelease(obj));    
         }
-        
+        else
+        {
+            obj.rb.linearVelocity = Vector2.right
+                * skillData.fireData[BASE_PROJECTILE_SPEED].GetValue(20);
+        }
+
+        await UniTask.Delay(skillData.fireData[BASE_COOLDOWN].GetValue(COOLDOWN_DEFAULT_VALUE));
+
+        isFireActive = false;
     }
 
     private IEnumerator ProjectileRelease(ProjectileData obj)
     {
-        yield return new WaitForSeconds(3);
+        yield return _waitForSeconds3;
         ReleaseObject(obj);
     }
 
     private void ProjectileActive(ProjectileData obj)
     {
+        obj.transform.position = muzzlePoint.position;
         obj.gameObject.SetActive(true);
     }
 
