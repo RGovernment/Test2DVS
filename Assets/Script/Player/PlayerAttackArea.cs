@@ -26,9 +26,13 @@ public class PlayerAttackArea : MonoBehaviour
     /// <summary>
     /// 리스트 내의 적 중 가장 가까운 대상을 찾아 반환합니다.
     /// </summary>
-    public Transform GetClosestTarget(out Transform closestTarget)
+    public bool GetClosestTarget(out Transform closestTarget)
     {
-        if (enemyList.Count <= 0) return closestTarget = null;
+        if (enemyList.Count <= 0)
+        {
+            closestTarget = null;
+            return false;
+        }
 
         closestTarget = null;
         float minDistanceSqr = Mathf.Infinity;
@@ -52,6 +56,6 @@ public class PlayerAttackArea : MonoBehaviour
                 closestTarget = enemyList[i].transform;
             }
         }
-        return closestTarget;
+        return true;
     }
 }

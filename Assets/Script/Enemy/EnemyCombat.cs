@@ -25,6 +25,16 @@ public class EnemyCombat : MonoBehaviour, IDamageable
         {
             Destroy(gameObject);
         }
+    }
 
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        if (collision != null && collision.collider.CompareTag("Player"))
+        {
+            if(collision.collider.TryGetComponent(out IDamageable data))
+            {
+                data.TakeDamage(stat.damage);
+            }
+        }
     }
 }

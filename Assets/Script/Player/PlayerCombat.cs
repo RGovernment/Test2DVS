@@ -37,9 +37,12 @@ public class PlayerCombat : MonoBehaviour, IDamageable
     public void TakeDamage(int damage)
     {
         if (hitTime > hitTimer) return;
-
+        
         stat.NowHp = Mathf.Clamp(stat.NowHp - (damage - stat.Armor), 0, stat.MaxHp);
+        Debug.Log(stat.NowHp);
         hitTimer = 0;
+
+
         if (stat.NowHp <= 0)
         {
             Destroy(gameObject);
