@@ -1,8 +1,11 @@
 using UnityEngine;
 
-public class Projectile
+
+[CreateAssetMenu(fileName = "ProjectileData",menuName = "Scriptable Object/Projectile")]
+public class Projectile : ScriptableObject
 {
-    private int id;
-    private string name;
-    private string damage;
+    public int Id;
+    public string ProjectileName;
+    public string Damage;
+    public Sprite Sprite;
 }

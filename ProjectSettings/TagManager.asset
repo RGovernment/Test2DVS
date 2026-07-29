@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - PoolOver
+  - Enemy
   layers:
   - Default
   - TransparentFX

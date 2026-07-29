@@ -1,105 +1,119 @@
+using Cysharp.Threading.Tasks;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Pool;
+using static Constants;
+using static Enums;
 using SF = UnityEngine.SerializeField;
 public class PlayerAttack : MonoBehaviour
 {
+    [SF] private PlayerAttackArea attackArea;
+    [SF] private Projectile[] projectile;
+    [SF] private List<ProjectileData> projectileData; 
     [SF] private GameObject bullet;
     [SF] private Transform muzzlePoint;
     [SF] private float bulletSpeed = 15f;
     [SF] private float lifeTime = 10f;
     [SF] private Transform muzzlePointOffset;
 
-    private ObjectPool<GameObject> bulletsPool;
+    private ObjectPool<ProjectileData> firePool;
 
     private SpriteRenderer sr;
-    private float direction;
     private void Awake()
     {
         sr = GetComponent<SpriteRenderer>();
-
-        bulletsPool = new ObjectPool<GameObject>(CreateBullet, BulletActive, BulletDisable,
-        BulletDistroy, true, 40, 400);
+        projectileData = new List<ProjectileData>();
+        firePool = new ObjectPool<ProjectileData>(CreateFire, ProjectileActive, ProjectileDisable,
+        ProjectileDistroy, true, 20, POOL_MAX_SIZE);
     }
 
     private void Update()
     {
-        //if (Keyboard.current.sKey.isPressed) Fire(GetObject());
-
-
-        direction = sr.flipX ? -1 : 1;
-        muzzlePoint.localPosition = 
-            new(muzzlePointOffset.localPosition.x * direction , 
-            muzzlePoint.localPosition.y, 
-            muzzlePoint.localPosition.z);
+        if (attackArea.enemyList.Count <= 0) return;
+        ActiveProjectile();
     }
 
-    private void Fire(GameObject obj)
+    private ProjectileData CreateFire()
     {
-        //GameObject bullets = Instantiate(bullet, muzzlePoint.position, muzzlePoint.rotation);
+        int itemIndex = 0;
+
+        GameObject obj = new(ProjectileType.Fire.ToString());
+
         obj.transform.parent = muzzlePoint;
-        obj.transform.SetPositionAndRotation(muzzlePoint.position, muzzlePoint.rotation);
 
-        Rigidbody2D rb2D = obj.GetComponent<Rigidbody2D>();
+        ProjectileData data = obj.AddComponent<ProjectileData>();
+        data.Id = projectile[itemIndex].Id;
+        data.ProjectileName = projectile[itemIndex].ProjectileName;
+        data.Damage = projectile[itemIndex].Damage;
+        data.Sprite = projectile[itemIndex].Sprite;
 
-        rb2D.linearVelocity = muzzlePoint.right * bulletSpeed * direction;
-        StartCoroutine(BulletRelease(obj));
+        projectileData.Add(data);
+
+        return data;
     }
 
-    private IEnumerator BulletRelease(GameObject obj)
+    private void ActiveProjectile()
+    {
+        // 파이어 작동(기본 공격) n 주기 마다 작동하도록 유지
+        if(GetObject(firePool, out ProjectileData data) != null) 
+            FireActive(data);
+    }
+
+
+    private void FireActive(ProjectileData obj)
+    {
+        if(attackArea.GetClosestTarget(out Transform target) != null) 
+        {
+            obj.transform.parent = muzzlePoint;
+            obj.transform.LookAt(target);
+
+            obj.rb.linearVelocity = 
+                (new Vector2(target.position.x,target.position.y) - obj.rb.position).normalized * bulletSpeed;
+            StartCoroutine(ProjectileRelease(obj));
+        }
+        
+    }
+
+    private IEnumerator ProjectileRelease(ProjectileData obj)
     {
         yield return new WaitForSeconds(3);
         ReleaseObject(obj);
     }
 
-    private GameObject CreateBullet()
+    private void ProjectileActive(ProjectileData obj)
     {
-        return Instantiate(bullet);
+        obj.gameObject.SetActive(true);
     }
 
-    private void BulletActive(GameObject obj)
+    private void ProjectileDisable(ProjectileData obj)
     {
-        obj.SetActive(true);
+        obj.gameObject.SetActive(false);
     }
 
-    private void BulletDisable(GameObject obj)
-    {
-        obj.SetActive(false);
-    }
-
-    private void BulletDistroy(GameObject obj)
+    private void ProjectileDistroy(ProjectileData obj)
     {
         Destroy(obj);
     }
 
-    public GameObject GetObject()
+    public ProjectileData GetObject(ObjectPool<ProjectileData> data, out ProjectileData projectile)
     {
-        GameObject sel = null;
+        // 1단계 방지턱 체크
+        if (firePool.CountActive >= POOL_MAX_SIZE) return projectile = null;
 
-        if (bulletsPool.CountActive >= 400)
-        {
-            sel = CreateBullet();
-            sel.tag = "PoolOver";
-        }
-        else
-        {
-            sel = bulletsPool.Get();
-        }
+        data.Get(out projectile);
 
-        return sel;
+        return projectile;
     }
 
-    public void ReleaseObject(GameObject obj)
+    public void ReleaseObject(ProjectileData obj)
     {
         if (obj.CompareTag("PoolOver"))
-        {
             Destroy(obj);
-        }
         else
-        {
-            bulletsPool.Release(obj);
-        }
+            firePool.Release(obj);
+        
     }
 
 }
