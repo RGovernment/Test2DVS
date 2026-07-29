@@ -5,6 +5,7 @@ public class PlayerMoveController : MonoBehaviour
 {
     [SF, Range(5, 50)] private int speed;
 
+    private SpriteRenderer sr;
     private BoxCollider2D col;
     private Rigidbody2D rb;
     private Vector2 moveVector = Vector2.zero;
@@ -13,6 +14,7 @@ public class PlayerMoveController : MonoBehaviour
     {
         col = GetComponent<BoxCollider2D>();
         rb = GetComponent<Rigidbody2D>();
+        sr = GetComponent<SpriteRenderer>();
     }
 
     private void Start()
@@ -22,6 +24,7 @@ public class PlayerMoveController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        sr.flipX = moveVector.x < 0;
         rb.linearVelocity = moveVector * speed;
     }
 
@@ -29,7 +32,8 @@ public class PlayerMoveController : MonoBehaviour
     {
         float moveY = Input.GetAxisRaw("Horizontal");
         float moveX = Input.GetAxisRaw("Vertical");
-
+        
         moveVector = new Vector2(moveY, moveX).normalized;
+        
     }
 }
