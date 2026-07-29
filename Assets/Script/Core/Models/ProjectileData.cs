@@ -6,11 +6,12 @@ public class ProjectileData : MonoBehaviour
 {
     public int Id;
     public string ProjectileName;
-    public string Damage;
+    public int Damage;
     public SpriteRenderer sr;
     public Sprite Sprite;
     public new BoxCollider2D collider;
     public Rigidbody2D rb;
+    public Collider2D mainCollider;
 
     private void Awake()
     {
@@ -27,5 +28,19 @@ public class ProjectileData : MonoBehaviour
         collider.offset = sr.sprite.bounds.center;
         collider.isTrigger = true;
         rb.gravityScale = 0;
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (!gameObject.activeSelf) return;
+
+        if (collision.TryGetComponent(out IDamageable obj) && !collision.CompareTag("AttackArea"))
+        {
+            obj.TakeDamage(Damage);
+            gameObject.SetActive(false);
+        }
+            
+        
+
     }
 }
