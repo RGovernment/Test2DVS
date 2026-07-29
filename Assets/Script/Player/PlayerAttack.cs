@@ -9,7 +9,7 @@ using static Constants;
 using static Enums;
 using SF = UnityEngine.SerializeField;
 using Unity.VisualScripting;
-public class PlayerAttack : MonoBehaviour
+public class PlayerAttack : MonoBehaviour, IDamageable
 {
     private readonly WaitForSeconds _waitForSeconds3 = new(3);
     [SF] private PlayerAttackArea attackArea;
@@ -56,6 +56,7 @@ public class PlayerAttack : MonoBehaviour
         data.Damage = projectile[itemIndex].Damage;
         data.Sprite = projectile[itemIndex].Sprite;
         data.mainCollider = mainCollider;
+        data.atk = this;
         projectileData.Add(data);
 
         return data;
@@ -140,4 +141,10 @@ public class PlayerAttack : MonoBehaviour
             firePool.Release(obj);
         
     }
+
+    public void TakeDamage(int damage)
+    {
+
+    }
+
 }
