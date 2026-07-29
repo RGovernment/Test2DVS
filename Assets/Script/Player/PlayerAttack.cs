@@ -123,7 +123,6 @@ public class PlayerAttack : MonoBehaviour
 
     public bool GetObject(ObjectPool<ProjectileData> data, out ProjectileData projectile)
     {
-        // 1단계 방지턱 체크
         if (firePool.CountActive >= POOL_MAX_SIZE)
         {
             projectile = null;
