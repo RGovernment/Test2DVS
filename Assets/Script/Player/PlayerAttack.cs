@@ -82,8 +82,6 @@ public class PlayerAttack : MonoBehaviour
 
             obj.transform.rotation = Quaternion.Euler(0, 0, angle);
 
-            Debug.Log((new Vector2(target.position.x, target.position.y) 
-                - new Vector2(muzzlePoint.transform.position.x, muzzlePoint.transform.position.y)).normalized);
             obj.rb.linearVelocity = 
                 (
                 new Vector2(target.position.x,target.position.y) - 
