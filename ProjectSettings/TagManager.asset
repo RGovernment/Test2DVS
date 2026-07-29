@@ -6,6 +6,7 @@ TagManager:
   tags:
   - PoolOver
   - Enemy
+  - AttackArea
   layers:
   - Default
   - TransparentFX

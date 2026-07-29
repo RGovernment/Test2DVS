@@ -6,6 +6,6 @@ public class Projectile : ScriptableObject
 {
     public int Id;
     public string ProjectileName;
-    public string Damage;
+    public int Damage;
     public Sprite Sprite;
 }

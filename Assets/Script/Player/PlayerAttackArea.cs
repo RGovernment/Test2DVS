@@ -52,7 +52,6 @@ public class PlayerAttackArea : MonoBehaviour
                 closestTarget = enemyList[i].transform;
             }
         }
-
         return closestTarget;
     }
 }

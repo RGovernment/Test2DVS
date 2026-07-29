@@ -8,6 +8,7 @@ using static SkillData;
 using static Constants;
 using static Enums;
 using SF = UnityEngine.SerializeField;
+using Unity.VisualScripting;
 public class PlayerAttack : MonoBehaviour
 {
     private readonly WaitForSeconds _waitForSeconds3 = new(3);
@@ -17,9 +18,11 @@ public class PlayerAttack : MonoBehaviour
     [SF] private GameObject bullet;
     [SF] private Transform muzzlePoint;
     [SF] private Transform muzzlePointOffset;
+    [SF] private BoxCollider2D mainCollider;
 
     private List<ProjectileData> projectileData;
     private ObjectPool<ProjectileData> firePool;
+
 
     private bool isFireActive;
 
@@ -31,6 +34,7 @@ public class PlayerAttack : MonoBehaviour
         firePool = new ObjectPool<ProjectileData>(CreateFire, ProjectileActive, ProjectileDisable,
         ProjectileDistroy, true, 20, POOL_MAX_SIZE);
     }
+    
 
     private void Update()
     {
@@ -51,7 +55,8 @@ public class PlayerAttack : MonoBehaviour
         data.ProjectileName = projectile[itemIndex].ProjectileName;
         data.Damage = projectile[itemIndex].Damage;
         data.Sprite = projectile[itemIndex].Sprite;
-
+        data.mainCollider = mainCollider;
+        data.atk = this;
         projectileData.Add(data);
 
         return data;
@@ -72,23 +77,19 @@ public class PlayerAttack : MonoBehaviour
     {
         if (attackArea.GetClosestTarget(out Transform target) != null) 
         {
-            obj.transform.LookAt(target);
-
             Vector2 direction = (Vector2)target.position - (Vector2)obj.transform.position;
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
             obj.transform.rotation = Quaternion.Euler(0, 0, angle);
 
             obj.rb.linearVelocity = 
-                (new Vector2(target.position.x,target.position.y) - obj.rb.position).normalized 
+                (
+                new Vector2(target.position.x,target.position.y) - 
+                new Vector2(muzzlePoint.transform.position.x, muzzlePoint.transform.position.y))
+                .normalized 
                 * skillData.fireData[BASE_PROJECTILE_SPEED].GetValue(20);
 
             StartCoroutine(ProjectileRelease(obj));    
-        }
-        else
-        {
-            obj.rb.linearVelocity = Vector2.right
-                * skillData.fireData[BASE_PROJECTILE_SPEED].GetValue(20);
         }
 
         await UniTask.Delay(skillData.fireData[BASE_COOLDOWN].GetValue(COOLDOWN_DEFAULT_VALUE));
@@ -99,7 +100,8 @@ public class PlayerAttack : MonoBehaviour
     private IEnumerator ProjectileRelease(ProjectileData obj)
     {
         yield return _waitForSeconds3;
-        ReleaseObject(obj);
+        if(obj.gameObject.activeSelf)
+            ReleaseObject(obj);
     }
 
     private void ProjectileActive(ProjectileData obj)
@@ -110,7 +112,8 @@ public class PlayerAttack : MonoBehaviour
 
     private void ProjectileDisable(ProjectileData obj)
     {
-        obj.gameObject.SetActive(false);
+        if(obj.gameObject.activeSelf)
+            obj.gameObject.SetActive(false);
     }
 
     private void ProjectileDistroy(ProjectileData obj)
@@ -136,5 +139,4 @@ public class PlayerAttack : MonoBehaviour
             firePool.Release(obj);
         
     }
-
 }
