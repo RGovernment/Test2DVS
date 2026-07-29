@@ -9,7 +9,7 @@ using static Constants;
 using static Enums;
 using SF = UnityEngine.SerializeField;
 using Unity.VisualScripting;
-public class PlayerAttack : MonoBehaviour, IDamageable
+public class PlayerAttack : MonoBehaviour
 {
     private readonly WaitForSeconds _waitForSeconds3 = new(3);
     [SF] private PlayerAttackArea attackArea;
@@ -141,10 +141,4 @@ public class PlayerAttack : MonoBehaviour, IDamageable
             firePool.Release(obj);
         
     }
-
-    public void TakeDamage(int damage)
-    {
-
-    }
-
 }

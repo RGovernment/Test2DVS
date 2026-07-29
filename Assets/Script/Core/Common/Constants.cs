@@ -12,6 +12,7 @@ public static class Constants
     public static string ARMOR = "armor";
     public static string DAMAGE = "damage";
     public static string HP = "hp";
+    public static string ID = "id";
     public static string NAME = "name";
     public static string SPEED = "speed";
     
