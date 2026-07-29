@@ -16,6 +16,12 @@ public class EnemyData : MonoBehaviour
         Instance = this;
     }
 
+    public EnemyStatus GetEnemyData()
+    {
+        int index= Random.Range(0, enemyList.Count);
+        return enemyList[index];
+    }
+
     public int GetEnemyID()
     {
         enemyId++;

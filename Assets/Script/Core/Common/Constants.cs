@@ -15,7 +15,8 @@ public static class Constants
     public static string ID = "id";
     public static string NAME = "name";
     public static string SPEED = "speed";
-    
+
+    public static string PLAYER_TAG = "Player";
     
     
 }
